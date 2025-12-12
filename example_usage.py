@@ -139,9 +139,9 @@ if __name__ == "__main__":
     print("=" * 50)
     
     # 运行示例
-    # example_basic_usage()
-    # example_job_validation()
-    # example_custom_queue()
+    example_basic_usage()
+    example_job_validation()
+    example_custom_queue()
     example_mysql_job_usage()  # 添加这一行来调用新的示例函数
     
     print("\n" + "=" * 50)

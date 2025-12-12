@@ -4,17 +4,46 @@ import logging
 import os
 from config import CELERY_BROKER_URL, CELERY_RESULT_BACKEND, LOG_LEVEL, LOG_DIR
 
-# 配置日志
-os.makedirs(LOG_DIR, exist_ok=True)
-logging.basicConfig(
-    level=LOG_LEVEL,
-    format='%(asctime)s %(levelname)s %(name)s %(message)s',
-    handlers=[
-        logging.FileHandler(os.path.join(LOG_DIR, 'celery_app.log'), encoding='utf-8'),
-        logging.StreamHandler()  # 同时输出到控制台
-    ]
-)
-logger = logging.getLogger(__name__)
+def setup_logging():
+    """
+    设置日志配置
+    """
+    # 确保日志目录存在
+    os.makedirs(LOG_DIR, exist_ok=True)
+    
+    # 获取当前模块的logger
+    logger = logging.getLogger(__name__)
+    logger.setLevel(LOG_LEVEL)
+    
+    # 清除现有的处理器
+    logger.handlers.clear()
+    
+    # 创建文件处理器
+    file_handler = logging.FileHandler(
+        os.path.join(LOG_DIR, 'celery_app.log'), 
+        encoding='utf-8'
+    )
+    file_handler.setLevel(LOG_LEVEL)
+    
+    # 创建控制台处理器
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(LOG_LEVEL)
+    
+    # 创建格式化器
+    formatter = logging.Formatter(
+        '%(asctime)s %(levelname)s %(name)s %(message)s'
+    )
+    file_handler.setFormatter(formatter)
+    console_handler.setFormatter(formatter)
+    
+    # 添加处理器到记录器
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+    
+    return logger
+
+# 设置日志
+logger = setup_logging()
 
 # 创建Celery应用实例
 app = Celery('datax_celery')
