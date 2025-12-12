@@ -9,7 +9,7 @@ import time
 # 获取项目根目录
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 DATAX_JOB_PATH = os.path.join(PROJECT_ROOT, 'datax', 'job', 'job.json')
-SAMPLE_MYSQL_JOB_PATH = os.path.join(PROJECT_ROOT, 'datax', 'job', 'sample_mysql_to_mysql.json')
+SAMPLE_MYSQL_JOB_PATH = os.path.join(PROJECT_ROOT, 'datax', 'job', 'datax_14_t_day_to_12_t_day-20251202103452.json')
 
 # 检查必要的文件是否存在
 if not os.path.exists(DATAX_JOB_PATH):
@@ -96,14 +96,53 @@ def example_custom_queue():
     print(f"已提交到高优先级队列的任务ID: {task_id}")
 
 
+def example_mysql_job_usage():
+    """MySQL作业示例"""
+    print("\n=== MySQL作业使用示例 ===")
+    
+    # 检查MySQL作业配置文件是否存在
+    if not os.path.exists(SAMPLE_MYSQL_JOB_PATH):
+        print(f"警告: MySQL作业配置文件不存在: {SAMPLE_MYSQL_JOB_PATH}")
+        return
+    
+    # 创建任务调度器实例
+    scheduler = DataXTaskScheduler()
+    
+    # 调度执行MySQL DataX作业
+    task_id = scheduler.schedule_job_execution(
+        job_config_path=SAMPLE_MYSQL_JOB_PATH,
+        jvm_params="-Xms512m -Xmx1g"
+    )
+    
+    print(f"已提交MySQL作业执行任务，任务ID: {task_id}")
+    
+    # 等待一段时间让任务执行完成
+    time.sleep(5)
+    
+    # 获取任务执行结果
+    result = scheduler.get_task_result(task_id)
+    print(f"任务状态: {result.state}")
+    if result.ready():
+        print(f"任务执行结果: {result.result}")
+    
+    # 检查执行是否成功
+    if result.successful():
+        execution_result = result.result
+        if execution_result.get('success', False):
+            print("MySQL DataX作业执行成功！")
+        else:
+            print(f"MySQL DataX作业执行失败: {execution_result.get('stderr', '未知错误')}")
+
+
 if __name__ == "__main__":
     print("欢迎使用 DataX-Celery 示例程序！")
     print("=" * 50)
     
     # 运行示例
-    example_basic_usage()
-    example_job_validation()
-    example_custom_queue()
+    # example_basic_usage()
+    # example_job_validation()
+    # example_custom_queue()
+    example_mysql_job_usage()  # 添加这一行来调用新的示例函数
     
     print("\n" + "=" * 50)
     print("=== 使用说明 ===")

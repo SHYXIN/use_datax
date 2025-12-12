@@ -81,7 +81,7 @@ class DataXTaskScheduler:
 
     def get_task_result(self, task_id: str):
         """
-        获取任务执行结果
+        获取任务执行结果（兼容旧版本接口）
         
         Args:
             task_id: 任务ID
@@ -94,6 +94,56 @@ class DataXTaskScheduler:
         # 获取任务结果
         result = execute_datax_job.AsyncResult(task_id)
         return result
+
+    def get_task_result_by_id(self, task_id: str, task_type: str = "execute"):
+        """
+        根据任务ID和任务类型获取任务执行结果
+        
+        Args:
+            task_id: 任务ID
+            task_type: 任务类型，"execute" 或 "validate"
+            
+        Returns:
+            任务执行结果
+        """
+        logger.info(f"获取{task_type}类型任务执行结果，任务ID: {task_id}")
+        
+        if task_type == "execute":
+            # 获取execute_datax_job任务结果
+            result = execute_datax_job.AsyncResult(task_id)
+        elif task_type == "validate":
+            # 获取validate_datax_job任务结果
+            result = validate_datax_job.AsyncResult(task_id)
+        else:
+            raise ValueError(f"不支持的任务类型: {task_type}")
+            
+        return result
+
+    def get_execute_datax_job_result(self, task_id: str):
+        """
+        获取execute_datax_job类型任务的执行结果
+        
+        Args:
+            task_id: 任务ID
+            
+        Returns:
+            任务执行结果
+        """
+        logger.info(f"获取execute_datax_job任务执行结果，任务ID: {task_id}")
+        return execute_datax_job.AsyncResult(task_id)
+
+    def get_validate_datax_job_result(self, task_id: str):
+        """
+        获取validate_datax_job类型任务的执行结果
+        
+        Args:
+            task_id: 任务ID
+            
+        Returns:
+            任务执行结果（布尔值，表示配置文件是否有效）
+        """
+        logger.info(f"获取validate_datax_job任务执行结果，任务ID: {task_id}")
+        return validate_datax_job.AsyncResult(task_id)
 
     def cancel_task(self, task_id: str) -> bool:
         """

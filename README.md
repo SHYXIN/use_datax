@@ -233,3 +233,6 @@ pip install -r requirements.txt
 ```bash
 celery -A celery_app worker --loglevel=info --pool=solo
 ```
+
+python ./datax/bin/datax.py ./datax/job/job.json
+python ./datax/bin/datax.py ./datax/job/datax_14_t_day_to_12_t_day-20251202103452.json
